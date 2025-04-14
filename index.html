@@ -29,21 +29,44 @@
   <ul id="listing"></ul>
 
   <script>
-    fetch("https://0a730527-a90f-457a-96cc-42949ee873a8-00-h3758ma4pf69.worf.replit.dev/files")
-      .then(res => res.json())
-      .then(data => {
-        const list = document.getElementById("listing");
-        data.forEach(item => {
-          const li = document.createElement("li");
-          const link = document.createElement("a");
-          link.textContent = item.name;
-          link.href = item.type === "dir"
-            ? `?path=${item.path}`
-            : `https://raw.githubusercontent.com/tocsixdev/lotofthings/main/${item.path}`;
-          li.appendChild(link);
-          list.appendChild(li);
-        });
-      });
+      const API_BASE = "https://0a730527-a90f-457a-96cc-42949ee873a8-00-h3758ma4pf69.worf.replit.dev/files";
+      const repoBase = "https://raw.githubusercontent.com/tocsixdev/lotofthings/main/";
+
+      let currentPath = new URLSearchParams(window.location.search).get("path") || "";
+
+      function render(path) {
+        fetch(`${API_BASE}?path=${encodeURIComponent(path)}`)
+          .then(res => res.json())
+          .then(data => {
+            const list = document.getElementById("listing");
+            list.innerHTML = "";
+
+            // Show "Go up" if not in root
+            if (path) {
+              const upLi = document.createElement("li");
+              const upLink = document.createElement("a");
+              upLink.textContent = "🔙 Go up";
+              const parent = path.split("/").slice(0, -1).join("/");
+              upLink.href = `?path=${encodeURIComponent(parent)}`;
+              upLi.appendChild(upLink);
+              list.appendChild(upLi);
+            }
+
+            // List files and folders
+            data.forEach(item => {
+              const li = document.createElement("li");
+              const link = document.createElement("a");
+              link.textContent = item.type === "dir" ? "📁 " + item.name : "📄 " + item.name;
+              link.href = item.type === "dir"
+                ? `?path=${encodeURIComponent(item.path)}`
+                : repoBase + item.path;
+              li.appendChild(link);
+              list.appendChild(li);
+            });
+          });
+      }
+
+      render(currentPath);
   </script>
 </body>
 </html>
