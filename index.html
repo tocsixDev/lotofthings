@@ -26,39 +26,23 @@
 <body>
   <h1>📁 Directory Listing</h1>
   <p>Loading file list...</p>
-  <div id="file-list"></div>
+  <ul id="listing"></ul>
 
   <script>
-    const REPLIT_PROXY_URL = "https://0a730527-a90f-457a-96cc-42949ee873a8-00-h3758ma4pf69.worf.replit.dev/files"; // CHANGE THIS!
-
-    fetch(REPLIT_PROXY_URL)
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-        return res.json();
-      })
-      .then(files => {
-        document.querySelector("p").remove();
-        const container = document.getElementById("file-list");
-
-        if (files.length === 0) {
-          container.textContent = "No files found.";
-          return;
-        }
-
-        files.forEach(file => {
-          const a = document.createElement("a");
-          a.href = `./src/music/${file}`; // Adapt this path if needed
-          a.textContent = file;
-          container.appendChild(a);
-          container.appendChild(document.createElement("br"));
+    fetch("https://0a730527-a90f-457a-96cc-42949ee873a8-00-h3758ma4pf69.worf.replit.dev/files")
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById("listing");
+        data.forEach(item => {
+          const li = document.createElement("li");
+          const link = document.createElement("a");
+          link.textContent = item.name;
+          link.href = item.type === "dir"
+            ? `?path=${item.path}`
+            : `https://raw.githubusercontent.com/tocsixdev/lotofthings/main/${item.path}`;
+          li.appendChild(link);
+          list.appendChild(li);
         });
-      })
-      .catch(err => {
-        document.querySelector("p").textContent = "Failed to load files:";
-        const errorElem = document.createElement("pre");
-        errorElem.className = "error";
-        errorElem.textContent = err;
-        document.getElementById("file-list").appendChild(errorElem);
       });
   </script>
 </body>
