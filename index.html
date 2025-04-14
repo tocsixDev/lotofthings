@@ -1,45 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 Not Found</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        .container {
-            background-color: #fff;
-            padding: 50px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            color: #ff0000;
-            font-size: 48px;
-        }
-        p {
-            color: #333;
-            font-size: 24px;
-        }
-        img {
-            margin-top: 20px;
-            width: 300px; /* Adjust the size as necessary */
-            border-radius: 10px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Directory Listing</title>
+  <style>
+    body {
+      font-family: monospace;
+      background-color: #1e1e1e;
+      color: #ddd;
+      padding: 20px;
+    }
+    a {
+      color: #4fd1c5;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .error {
+      color: #f87171;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>404 Not Found</h1>
-        <img src="https://www.icegif.com/wp-content/uploads/2023/01/icegif-162.gif" alt="Rickroll GIF">
-        <p>Oops! Looks like this page doesn't exist.</p>
-    </div>
+  <h1>📁 Directory Listing</h1>
+  <p>Loading file list...</p>
+  <div id="file-list"></div>
+
+  <script>
+    const REPLIT_PROXY_URL = "https://files.tocsixis-adev.repl.co/files"; // CHANGE THIS!
+
+    fetch(REPLIT_PROXY_URL)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+        return res.json();
+      })
+      .then(files => {
+        document.querySelector("p").remove();
+        const container = document.getElementById("file-list");
+
+        if (files.length === 0) {
+          container.textContent = "No files found.";
+          return;
+        }
+
+        files.forEach(file => {
+          const a = document.createElement("a");
+          a.href = `./src/music/${file}`; // Adapt this path if needed
+          a.textContent = file;
+          container.appendChild(a);
+          container.appendChild(document.createElement("br"));
+        });
+      })
+      .catch(err => {
+        document.querySelector("p").textContent = "Failed to load files:";
+        const errorElem = document.createElement("pre");
+        errorElem.className = "error";
+        errorElem.textContent = err;
+        document.getElementById("file-list").appendChild(errorElem);
+      });
+  </script>
 </body>
 </html>
